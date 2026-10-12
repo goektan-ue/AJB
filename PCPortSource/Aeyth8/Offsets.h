@@ -31,6 +31,7 @@ namespace A8CL
 
 		extern OFFSET ProcessEvent;
 		extern OFFSET Invoke;
+		extern OFFSET AddAxisMapping;
 		extern OFFSET AppPreExit;
 
 		extern OFFSET SetClientTravel;
@@ -110,6 +111,9 @@ namespace A8CL
 		extern OFFSET IsTenpoHost;
 		extern OFFSET IsAJBOfflineMode;
 		extern OFFSET IsOfflineMode;
+
+		extern OFFSET InGameTurnRate;
+		extern OFFSET InGameLookUpRate;
 		extern OFFSET Screenshot;
 
 		// Byte Patches
@@ -143,6 +147,7 @@ namespace A8CL
 		constexpr ull VFT_LocalTravel			= 0x13F; // APlayerController::LocalTravel
 		constexpr ull VFT_NetworkFailureMsg		= 0x62;	 // UGameViewportClient::PeekNetworkFailureMessages
 		constexpr ull VFT_ClientMessage			= 0x123; // APlayerController::ClientMessage
+		constexpr ull VFT_CanInputCamera		= 0x1E6; // AAJBInGamePlayerController, no proper name, TurnRate/LookUpRate only pass their value on if this returns true
 
 		// Non-Hooks
 

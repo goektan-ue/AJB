@@ -187,6 +187,9 @@ std::vector<Hooks::HookStructure> StandaloneHooks =
 	{OFF::MediaPlayer,						AJB::UMediaPlayer},
 	{OFF::PostEventAtLocation,				AJB::PostEventAtLocation},
 	{OFF::ChangeState,						AJB::FlowUtilChangeState},
+	{OFF::AddAxisMapping,					AJB::AddAxisMapping},
+	{OFF::InGameTurnRate,					AJB::TurnRate},
+	{OFF::InGameLookUpRate,					AJB::LookUpRate},
 	
 	// Server logic hooks
 
@@ -1294,6 +1297,54 @@ bool __fastcall AJB::FlowUtilChangeState(SDK::FFlowStateHandler* StateHandler, S
 	}
 	
 	return OFF::ChangeState.VerifyFC<bool(__fastcall*)(SDK::FFlowStateHandler* StateHandler, SDK::FGameplayTag NextStateTag)>()(StateHandler, NextStateTag);
+}
+
+// bDebugInputMode maps MouseX/MouseY onto TurnRate/LookUpRate, those run the value through the stick curve and use it as a turn speed,
+// which is why looking around with the mouse feels like holding a stick. The two mappings get skipped and the mouse delta is added directly instead.
+void __fastcall AJB::AddAxisMapping(SDK::UPlayerInput* This, SDK::FInputAxisKeyMapping& KeyMapping)
+{
+	static const SDK::FName MouseX{FName::NAME_FindOrAdd(L"MouseX")};
+	static const SDK::FName MouseY{FName::NAME_FindOrAdd(L"MouseY")};
+	static const SDK::FName TurnRate{FName::NAME_FindOrAdd(L"TurnRate")};
+	static const SDK::FName LookUpRate{FName::NAME_FindOrAdd(L"LookUpRate")};
+
+	if ((KeyMapping.Key.KeyName == MouseX && KeyMapping.AxisName == TurnRate) || (KeyMapping.Key.KeyName == MouseY && KeyMapping.AxisName == LookUpRate))
+	{
+		return;
+	}
+
+	OFF::AddAxisMapping.VerifyFC<void(__fastcall*)(SDK::UPlayerInput*, SDK::FInputAxisKeyMapping&)>()(This, KeyMapping);
+}
+
+static bool CanMouseLook(SDK::APlayerController* PC)
+{
+	if (!PC->Pawn || PC->bShowMouseCursor) return false;
+
+	return A8CL::OFFSET::VFTable<bool(__fastcall*)(SDK::APlayerController*)>(PC)[OFF::VFT_CanInputCamera](PC);
+}
+
+void __fastcall AJB::TurnRate(SDK::APlayerController* This, float Value)
+{
+	OFF::InGameTurnRate.VerifyFC<void(__fastcall*)(SDK::APlayerController*, float)>()(This, Value);
+
+	if (CanMouseLook(This))
+	{
+		float DeltaX{0}, DeltaY{0};
+		This->GetInputMouseDelta(&DeltaX, &DeltaY);
+		This->AddYawInput(DeltaX);
+	}
+}
+
+void __fastcall AJB::LookUpRate(SDK::APlayerController* This, float Value)
+{
+	OFF::InGameLookUpRate.VerifyFC<void(__fastcall*)(SDK::APlayerController*, float)>()(This, Value);
+
+	if (CanMouseLook(This))
+	{
+		float DeltaX{0}, DeltaY{0};
+		This->GetInputMouseDelta(&DeltaX, &DeltaY);
+		This->AddPitchInput(-DeltaY); // Same as the LookUp mapping in DefaultInput.ini (Scale=-1)
+	}
 }
 
 void __fastcall AJB::OnToggleFullMapVisibility(InvokeStack* Forwarded)

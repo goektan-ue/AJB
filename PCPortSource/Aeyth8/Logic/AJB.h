@@ -32,6 +32,8 @@ namespace SDK
 	class AGameModeBase;
 	class AGameMode;
 	class APlayerController;
+	class UPlayerInput;
+	struct FInputAxisKeyMapping;
 	class ACharacter;
 	class AActor;
 	class APawn;
@@ -365,6 +367,11 @@ namespace AJB
 	void __fastcall IsEnableSelect(InvokeStack* Forwarded);
 	void __fastcall OnDecidedWindowEndGameConfirm(InvokeStack* Forwarded);
 	void __fastcall OnOpeningOrClosingAnyWindow(InvokeStack* Forwarded);
+
+	// Mouse look
+	void __fastcall AddAxisMapping(SDK::UPlayerInput* This, SDK::FInputAxisKeyMapping& KeyMapping);
+	void __fastcall TurnRate(SDK::APlayerController* This, float Value);
+	void __fastcall LookUpRate(SDK::APlayerController* This, float Value);
 
 	// Constructor Hooks
 	SDK::UAJBWindowWidget* __fastcall AJBWindowWidget(SDK::UAJBWindowWidget* This);

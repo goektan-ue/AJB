@@ -25,6 +25,7 @@ namespace OFF
 
 	OFFSET ProcessEvent("UObject::ProcessEvent", 0x823B30);
 	OFFSET Invoke("UFunction::Invoke", 0x70DBF0);
+	OFFSET AddAxisMapping("UPlayerInput::AddAxisMapping", 0x1793D30);
 	OFFSET AppPreExit("FEngineLoop::AppPreExit", 0x1E3380);
 
 	OFFSET SetClientTravel("UEngine::SetClientTravel", 0x1781B80);
@@ -118,6 +119,9 @@ namespace OFF
 	OFFSET IsTenpoHost("AAJBOutGameProxy::IsTenpoHost", 0x507210);
 	OFFSET IsAJBOfflineMode("UAJBUtilityFunctionLibrary::IsAJBOfflineMode", 0x49DE20);
 	OFFSET IsOfflineMode("UAJBNetworkObserver::IsOfflineMode", 0x4ED5D0);
+
+	OFFSET InGameTurnRate("AAJBInGamePlayerController::TurnRate", 0x4A8E10);
+	OFFSET InGameLookUpRate("AAJBInGamePlayerController::LookUpRate", 0x4A7220);
 
 }
 }
